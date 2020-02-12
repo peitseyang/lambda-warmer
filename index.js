@@ -7,7 +7,7 @@
  * @license MIT
  */
 
-const id = Date.now().toString() + '-' + ('0000' + Math.floor(Math.random()*1000).toString()).substr(-4)
+const id = Date.now().toString() + '-' + ('0000' + Math.floor(Math.random() * 1000).toString()).substr(-4)
 
 let warm = false
 let lastAccess = null
@@ -17,7 +17,7 @@ const funcVersion = process.env.AWS_LAMBDA_FUNCTION_VERSION
 
 const delay = ms => new Promise(res => setTimeout(res, ms))
 
-module.exports = (event,cfg = {}) => {
+module.exports = (event, cfg = {}) => {
 
   let config = Object.assign({}, {
     flag: 'warmer', // default test flag
@@ -26,7 +26,7 @@ module.exports = (event,cfg = {}) => {
     log: true, // default logging to true
     correlationId: id, // default the correlationId
     delay: 75 // default the delay to 75ms
-  },cfg)
+  }, cfg)
 
   // If the event is a warmer ping
   if (event && event[config.flag]) {
@@ -57,7 +57,7 @@ module.exports = (event,cfg = {}) => {
       concurrency: invokeTotal,
       warm,
       lastAccessed: lastAccess,
-      lastAccessedSeconds: lastAccess === null ? null : ((Date.now()-lastAccess)/1000).toFixed(1)
+      lastAccessedSeconds: lastAccess === null ? null : ((Date.now() - lastAccess) / 1000).toFixed(1)
     }
 
     // Log it
@@ -77,7 +77,7 @@ module.exports = (event,cfg = {}) => {
       let invocations = []
 
       // loop through concurrency count
-      for (let i=2; i <= concurrency; i++) {
+      for (let i = 2; i <= concurrency; i++) {
 
         // Set the params and wait for the final function to finish
         let params = {
@@ -105,11 +105,11 @@ module.exports = (event,cfg = {}) => {
       return delay(config.delay).then(() => true)
     }
 
-    return Promise.resolve(true, log.lastAccessed)
+    return Promise.resolve({ warmer: true, lastAccessed: log.lastAccessed })
   } else {
     warm = true
     lastAccess = Date.now()
-    return Promise.resolve(false)
+    return Promise.resolve({ warmer: false })
   }
 
 } // end module
