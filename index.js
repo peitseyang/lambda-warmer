@@ -105,7 +105,7 @@ module.exports = (event,cfg = {}) => {
       return delay(config.delay).then(() => true)
     }
 
-    return Promise.resolve(true)
+    return Promise.resolve(true, log.lastAccessed)
   } else {
     warm = true
     lastAccess = Date.now()
